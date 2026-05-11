@@ -1,0 +1,39 @@
+name: Internship Parser (Hourly)
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # Every hour, on the hour (UTC)
+  workflow_dispatch:        # Also allows manual trigger from GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run internship parser
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          HANDSHAKE_COOKIE: ${{ secrets.HANDSHAKE_COOKIE }}
+        run: python scraper.py
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-logs
+          path: "*.log"
+          retention-days: 3
