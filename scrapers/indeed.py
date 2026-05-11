@@ -56,12 +56,9 @@ def scrape_indeed(search_terms: list) -> list:
                 "app_id": APP_ID,
                 "app_key": API_KEY,
                 "what": term,
-                "what_and": "intern",
-                "category": "science-quality-jobs",
                 "results_per_page": 20,
                 "sort_by": "date",
                 "max_days_old": 7,
-                "content-type": "application/json",
             }
 
             resp = requests.get(BASE_URL, params=params, timeout=15)
@@ -111,4 +108,4 @@ def scrape_indeed(search_terms: list) -> list:
 
 def _is_internship(title: str) -> bool:
     t = title.lower()
-    return any(kw in t for kw in ["intern", "internship", "co-op", "coop"])
+    return any(kw in t for kw in ["intern", "internship", "co-op", "coop", "summer", "Research"])
